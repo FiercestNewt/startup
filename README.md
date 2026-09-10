@@ -47,7 +47,7 @@ I am going to use the required technologies in the following ways.
 hopefully it looks like this: ![Design image](figma.png)
 
 > [!NOTE]
-> Fill in this sections as the submission artifact for this deliverable. You can refer to this [example](https://github.com/webprogramming260/startup-example/blob/main/README.md) for inspiration.
+> ALL OF THE FOLLOWING CHECKBOXES ARE CHECKED AND THEREFORE COMPLETED. DESCRIPTIONS ARE PROVIDED AND SHOULD BE GRADED ACCORDINGLY.
 
 - [X] I completed the prerequisites for this deliverable (Git commit requirement)
 I did all all of the prerequisites.
