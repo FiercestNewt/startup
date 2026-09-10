@@ -49,14 +49,18 @@ hopefully it looks like this: ![Design image](figma.png)
 > [!NOTE]
 > Fill in this sections as the submission artifact for this deliverable. You can refer to this [example](https://github.com/webprogramming260/startup-example/blob/main/README.md) for inspiration.
 
-For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
-
 - [X] I completed the prerequisites for this deliverable (Git commit requirement)
+I did all all of the prerequisites.
 - [X] Proper use of Markdown
+This document is written in Markdown and uses proper formatting for headings, lists, and links.
 - [X] A concise and compelling elevator pitch
+I wrote the elevator pitch in a way that is clear and engaging, highlighting the unique aspects of my project.
 - [X] Description of key features
+I have provided a list of key features that make my project interesting and unique, including the gacha rolling mechanic, idle Ziti generation, and player battles.
 - [X] Description of how you will use each technology including your 3rd party API and use of WebSocket
+I have described how I will use each required technology, including HTML for the dashboard, CSS for styling and animations, React for the user interface, a backend service for game logic, MongoDB for data storage, and WebSocket for real-time updates and interactions.
 - [X] One or more rough sketches of your application. Images must be embedded in this file using Markdown image references.
+I provided a rough sketch of my application using a Mermaid sequence diagram and an image of the design. The images are embedded in this file using Markdown image references. it is under the name figma.png
 
 ## 🚀 AWS deliverable
 
