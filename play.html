@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <!-- Tell browsers not to scale the viewport automatically -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Simon</title>
+    <title>Gro</title>
     <link rel="icon" href="favicon.ico" />
   </head>
   <body>
@@ -28,6 +28,7 @@
     </header>
 
     <main>
+      <!-- This is where the websocket would connect to get live scores from other players and placed in the connected ul section-->
       <div class="players">
         Player:
         <span class="player-name">Its you</span>
@@ -55,44 +56,8 @@
       <br />
 
       <div>
-        <table>
-          <tr>
-            <td>
-              <button>
-                <svg aria-hidden="true" viewBox="0 0 100 100" height="100" width="100">
-                  <!-- SVG
-                    M move <to x,y>
-                    Q quadratic curve <control point x,y> <to x,y>
-                -->
-                  <path d="M 95,5 95,95 5,95 Q 5,5 95,5" fill="green" />
-                </svg>
-              </button>
-            </td>
-            <td>
-              <button>
-                <svg aria-hidden="true" viewBox="0 0 100 100" height="100" width="100">
-                  <path d="M5,5 5,95 95,95 Q 95,5 5,5" fill="red" />
-                </svg>
-              </button>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <button>
-                <svg aria-hidden="true" viewBox="0 0 100 100" height="100" width="100">
-                  <path d="M5,5 95,5 95,95 Q 5,95 5,5" fill="blue" />
-                </svg>
-              </button>
-            </td>
-            <td>
-              <button>
-                <svg aria-hidden="true" viewBox="0 0 100 100" height="100" width="100">
-                  <path d="M95,5 5,5 5,95 Q 95,95 95,5" fill="yellow" />
-                </svg>
-              </button>
-            </td>
-          </tr>
-        </table>
+        <button>Buy</button>
+        <button>Sell</button>
       </div>
     </main>
 
