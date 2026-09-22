@@ -102,7 +102,7 @@ I provided a rough sketch of my application using a Mermaid sequence diagram and
 
 ## 🚀 HTML deliverable
 
-- [X] I completed the prerequisites for this deliverable (Simon deployed, GitHub link, Git commits)
+- [X] I completed the prerequisites for this deliverable 
 - [X] **HTML pages** - My project has multiple html pages
 - [X] **Proper HTML element usage** - the usage is correct
 - [X] **Links** - there are links to each page in the html pages
@@ -117,7 +117,7 @@ I provided a rough sketch of my application using a Mermaid sequence diagram and
 
 For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
 
-- [ ] I completed the prerequisites for this deliverable (Simon deployed, GitHub link, Git commits)
+- [ ] I completed the prerequisites for this deliverable
 - [ ] **Visually appealing colors and layout. No overflowing elements.** - I did not complete this part of the deliverable.
 - [ ] **Use of a CSS framework** - I did not complete this part of the deliverable.
 - [ ] **All visual elements styled using CSS** - I did not complete this part of the deliverable.
