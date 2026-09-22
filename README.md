@@ -7,41 +7,71 @@ This is my cool project for cs260
 > [!NOTE]
 > I will be editing this during the course to reflect my progress
 
-### Elevator pitch
+# Elevator pitch
 
-You start with a small amount of "Ziti" (your in-game currency). You spend Ziti to "roll" for random Italian brainrot meme entities—think Level 1 Crook, Sigma Nonna, Biblically Accurate Pizza, or The Sentient Gabagool.
+You start with a small amount of virtual money and compete against other players to build the largest portfolio possible. The stock market is simulated at an accelerated rate, with each tick representing a new day of market activity. Players can buy and sell stocks as prices change, trying to make the best decisions before their competitors.
 
-Once you own them, they generate passive Ziti for you over time (Idle mechanic). You can also assemble a team of your top three characters and challenge other players in the arena to steal their Ziti (Battler mechanic).
+Players can compete in shared games with live leaderboards, allowing them to see their rankings change as the simulated market moves. The goal is simple: **make the most money before the game ends.**
 
-### Design
+# Design
 
 ![Design image](icon.png)
 
-This is a cool image for the project. i hope you like it.
+The website will have a dashboard centered around the simulated stock market. Players will be able to view stock prices, charts, their portfolio, available cash, recent transactions, and their current position on the leaderboard.
 
 ```mermaid
 sequenceDiagram
-    actor You
-    actor Website
-    You->>Website: Replace this with your design
+    actor Player
+    participant Website
+    participant Server
+    participant Database
+
+    Player->>Website: Log in
+    Website->>Server: Authenticate
+    Server->>Database: Verify account
+    Database-->>Server: Account data
+    Server-->>Website: Login successful
+
+    Player->>Website: Buy stock
+    Website->>Server: Submit purchase
+    Server->>Server: Validate transaction
+    Server->>Database: Save portfolio changes
+    Server-->>Website: Update portfolio
+
+    Server-->>Website: Broadcast market update
+    Website-->>Player: Display new prices and leaderboard
 ```
 
-### Key features
+# Key features
 
-- Gacha rolling for random Italian brainrot meme entities
-- Idle mechanic for passive Ziti generation
-- Battler mechanic for challenging other players and stealing their Ziti
+* **Simulated stock market** where prices change automatically over time
+* **Accelerated market time**, with each market tick representing a simulated day
+* **Stock trading** where players can buy and sell shares
+* **Portfolio management** showing current holdings, cash, and total net worth
+* **Real-time leaderboard** showing how players compare to each other
+* **Trading history** showing previous purchases and sales
+* **User accounts** with saved progress and portfolios
+* **Market events** that can cause unexpected changes in stock prices
+* **Live updates** so players do not need to refresh the page to see market changes
 
-### Technologies
+# Technologies
 
 I am going to use the required technologies in the following ways.
 
-- **HTML** - dashboard that shows all of your characters and their stats
-- **CSS** - animations and styling for the dashboard and character cards
-- **React** - component-based architecture for the user interface
-- **Service** - Backend service to handle user accounts, character data, and game logic
-- **DB/Login** - MongoDB to store user accounts, character data, and game progress
-- **WebSocket** - Real-time updates for battles and Ziti generation. pull random gifs for attacks and things like that. maybe even a chat feature for battling players. (https://developers.giphy.com/) or (https://tenor.com/gifapi)
+* **HTML** - Provide the basic structure of the website, including the dashboard, stock information, portfolio, trading interface, leaderboard, and other page elements.
+
+* **CSS** - Style the dashboard, stock cards, charts, buttons, tables, and other interface elements. CSS animations can be used to show price changes and other real-time events.
+
+* **React** - Build the website using reusable components and provide user reactivity. React will be used for components such as stock cards, portfolio tables, charts, trading forms, and the leaderboard. React routing will be used to navigate between pages such as the dashboard, portfolio, market, and account pages.
+
+* **Web Service** - Provide backend endpoints for user authentication, buying and selling stocks, retrieving portfolio information, managing games, and generating/simulating stock market data.
+
+* **Database** - MongoDB will store user accounts, authentication information, portfolios, stock holdings, transactions, game information, and player statistics.
+
+* **WebSocket** - Provide real-time communication between the server and connected players. The server will use WebSockets to push new stock prices, market ticks, transactions, leaderboard changes, and other game events to players without requiring them to refresh the page.
+
+* **Third-Party API** - I plan to use the [Alpha Vantage API](https://www.alphavantage.co/) to retrieve real-world stock and company information. This information can be used to populate the stocks available in the simulator, while the actual prices used during a game will be generated by my own simulated market.
+
 
 ## 🚀 Specification Deliverable
 hopefully it looks like this: ![Design image](figma.png)
@@ -64,26 +94,22 @@ I provided a rough sketch of my application using a Mermaid sequence diagram and
 
 ## 🚀 AWS deliverable
 
-For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
-
-- [ ] **Rented EC2 server** - I did not complete this part of the deliverable.
-- [ ] **Leased domain name** - I did not complete this part of the deliverable.
-- [ ] **Server accessible** from my domain: [https://yourdomainnamehere.click](https://yourdomainnamehere.click) - I did not complete this part of the deliverable.
+- [X] **Rented EC2 server** - done
+- [X] **Leased domain name** - I got a domain name and set it up
+- [X] **Server accessible** from my domain: [https://cs260.fiercestnewt.dev](https://cs260.fiercestnewt.dev)
 
 ## 🚀 HTML deliverable
 
-For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
-
-- [ ] I completed the prerequisites for this deliverable (Simon deployed, GitHub link, Git commits)
-- [ ] **HTML pages** - I did not complete this part of the deliverable.
-- [ ] **Proper HTML element usage** - I did not complete this part of the deliverable.
-- [ ] **Links** - I did not complete this part of the deliverable.
-- [ ] **Text** - I did not complete this part of the deliverable.
-- [ ] **3rd party API placeholder** - I did not complete this part of the deliverable.
-- [ ] **Images** - I did not complete this part of the deliverable.
-- [ ] **Login placeholder** - I did not complete this part of the deliverable.
-- [ ] **DB data placeholder** - I did not complete this part of the deliverable.
-- [ ] **WebSocket placeholder** - I did not complete this part of the deliverable.
+- [X] I completed the prerequisites for this deliverable (Simon deployed, GitHub link, Git commits)
+- [X] **HTML pages** - My project has multiple html pages
+- [X] **Proper HTML element usage** - the usage is correct
+- [X] **Links** - there are links to each page in the html pages
+- [X] **Text** - there is text yes
+- [ ] **3rd party API placeholder** - comments show where i would connect to api
+- [ ] **Images** - there are some images
+- [ ] **Login placeholder** - done
+- [ ] **DB data placeholder** - done
+- [ ] **WebSocket placeholder** - done
 
 ## 🚀 CSS deliverable
 
