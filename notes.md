@@ -18,6 +18,9 @@ Interesting things I have learned about AWS
 ## HTML
 
 Interesting things I have learned about HTML
+There are a lot of different tags in HTML
+CSS is used to style HTML
+There is so much you can do with HTML and CSS
 
 ## React
 

@@ -4,14 +4,14 @@
     <meta charset="UTF-8" />
     <!-- Tell browsers not to scale the viewport automatically -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Play | Grow ur Stonks</title>
+    <title>Home | Grow ur Stonks</title>
     <link rel="icon" href="trophy.png" />
+    <link rel="stylesheet" href="style.css" />
   </head>
   <body>
     <!-- Use header, main, and footer elements to give semantic structure -->
     <header>
       <h1>Grow ur Stonks</h1>
-
       <!-- Navigation elements -->
       <nav>
         <!-- Menu is a semantic alternative to <ul> that represents an interaction -->
@@ -27,7 +27,7 @@
       <hr />
     </header>
 
-    <main>
+    <main class="home-main">
       <h1>Welcome to Grow ur Stonks</h1>
       <form method="get" action="play.html">
         <label for="email">Email address</label>
@@ -40,8 +40,8 @@
           <span>🔒</span>
           <input type="password" placeholder="password" />
         </div>
-        <button type="submit">Login</button>
-        <button type="submit">Create</button>
+        <button type="submit">Play in Group</button>
+        <button type="submit">Play Alone</button>
         <!-- this is where i would connect to a login system to handle authentication -->
       </form>
     </main>
