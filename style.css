@@ -26,7 +26,6 @@ footer {
 }
 
 header {
-  padding: 2rem;
   background: #20312a;
 }
 
@@ -35,26 +34,18 @@ header h1 {
   color: #ffffff;
 }
 
-nav menu {
-  display: flex;
-  gap: 1.25rem;
-  margin: 1.25rem 0 0;
-  padding: 0;
-  list-style: none;
-}
-
 header nav a,
 footer a {
-  color: #b9e7c9 !important;
+  color: #b9e7c9 ;
   font-weight: 700;
-  text-decoration: none !important;
+  text-decoration: none ;
 }
 
 header nav a:hover,
 header nav a:focus-visible,
 footer a:hover,
 footer a:focus-visible {
-  color: #ffffff !important;
+  color: #ffffff ;
 }
 
 hr {
@@ -140,26 +131,58 @@ form div:focus-within {
 button {
   display: inline-block;
   margin: 0.35rem 0.5rem 0 0;
-  padding: 0.7rem 1.1rem !important;
-  border: 1px solid #0d432c !important;
-  border-radius: 0.4rem !important;
-  color: #ffffff !important;
-  background: #176b45 !important;
+  padding: 0.7rem 1.1rem ;
+  border: 1px solid #0d432c ;
+  border-radius: 0.4rem ;
+  color: #ffffff ;
+  background: #176b45 ;
   font: inherit;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 0.25rem 0.75rem rgb(32 49 42 / 20%) !important;
+  box-shadow: 0 0.25rem 0.75rem rgb(32 49 42 / 20%) ;
 }
 
 button:hover,
 button:focus-visible {
-  color: #ffffff !important;
-  background: #238b5a !important;
-  border-color: #176b45 !important;
+  color: #ffffff ;
+  background: #238b5a ;
+  border-color: #176b45 ;
+}
+
+table {
+  width: min(100%, 52rem);
+  border-collapse: collapse;
+  background: #ffffff;
+  box-shadow: 0 0.75rem 2rem rgb(32 49 42 / 10%);
+}
+
+th,
+td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #c3d9c8;
+  text-align: left;
+}
+
+th {
+  color: #ffffff;
+  background: #176b45;
+}
+
+.notification {
+  width: min(100%, 28rem);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  text-align: left;
+}
+
+.notification li {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #c3d9c8;
+  background: #ffffff;
 }
 
 footer {
-  padding: 1rem;
   color: #d8e8dc;
   background: #20312a;
 }
@@ -169,7 +192,8 @@ footer hr {
 }
 
 @media (max-width: 30rem) {
-  nav menu {
-    flex-wrap: wrap;
+  th,
+  td {
+    padding: 0.6rem;
   }
 }
