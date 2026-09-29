@@ -117,13 +117,12 @@ I provided a rough sketch of my application using a Mermaid sequence diagram and
 
 For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
 
-- [ ] I completed the prerequisites for this deliverable
-- [ ] **Visually appealing colors and layout. No overflowing elements.** - I did not complete this part of the deliverable.
-- [ ] **Use of a CSS framework** - I did not complete this part of the deliverable.
-- [ ] **All visual elements styled using CSS** - I did not complete this part of the deliverable.
-- [ ] **Responsive to window resizing using flexbox and/or grid display** - I did not complete this part of the deliverable.
-- [ ] **Use of a imported font** - I did not complete this part of the deliverable.
-- [ ] **Use of different types of selectors including element, class, ID, and pseudo selectors** - I did not complete this part of the deliverable.
+- [X] **Visually appealing colors and layout. No overflowing elements.** - I completed this part of the deliverable.
+- [X] **Use of a CSS framework** - I completed this part of the deliverable.
+- [X] **All visual elements styled using CSS** - I completed this part of the deliverable.
+- [X] **Responsive to window resizing using flexbox and/or grid display** - I completed this part of the deliverable.
+- [X] **Use of a imported font** - I completed this part of the deliverable.
+- [X] **Use of different types of selectors including element, class, ID, and pseudo selectors** - I completed this part of the deliverable.
 
 ## 🚀 React part 1: Routing deliverable
 
