@@ -27,3 +27,5 @@ There is so much you can do with HTML and CSS
 Interesting things I have learned about React
 
 I love web programming
+
+Vite is pretty cool. I am using it now for web stuff.
