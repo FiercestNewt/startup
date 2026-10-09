@@ -2,6 +2,8 @@
 
 [My Notes](notes.md)
 
+# See the project at [https://startup.cs260.fiercestnewt.dev](https://startup.cs260.fiercestnewt.dev)
+
 This is my cool project for cs260
 
 ## Running locally
