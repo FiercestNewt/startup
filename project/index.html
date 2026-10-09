@@ -2,56 +2,13 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <!-- Tell browsers not to scale the viewport automatically -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Home | Grow ur Stonks</title>
-    <link rel="icon" href="trophy.png" />
-    <link rel="stylesheet" href="style.css" />
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" href="/trophy.png" />
+    <meta name="theme-color" content="#20312a" />
+    <title>Grow ur Stonks</title>
   </head>
   <body>
-    <!-- Use header, main, and footer elements to give semantic structure -->
-    <header class="p-8">
-      <h1>Grow ur Stonks</h1>
-      <!-- Navigation elements -->
-      <nav>
-        <!-- Menu is a semantic alternative to <ul> that represents an interaction -->
-        <menu class="flex flex-wrap gap-5 mt-5 p-0">
-          <li><a href="index.html">Home</a></li>
-          <li><a href="play.html">Play</a></li>
-          <li><a href="scores.html">Scores</a></li>
-          <li><a href="about.html">About</a></li>
-        </menu>
-      </nav>
-
-      <!-- Since we don't have the ability to style we use old style HTML to give some visual formatting -->
-      <hr />
-    </header>
-
-    <main class="home-main">
-      <h1>Welcome to Grow ur Stonks</h1>
-      <form method="get" action="play.html">
-        <label for="email">Email address</label>
-        <div>
-          <span>@</span>
-          <input id="email" type="email" placeholder="your@email.com" />
-        </div>
-
-        <div>
-          <span>🔒</span>
-          <input type="password" placeholder="password" />
-        </div>
-        <button type="submit">Play in Group</button>
-        <button type="submit">Play Alone</button>
-        <!-- this is where i would connect to a login system to handle authentication -->
-      </form>
-    </main>
-
-    <footer class="p-4">
-      <hr />
-      <span class="text-reset">Ethan Geslison</span>
-      <br />
-      <a href="https://github.com/fiercestnewt/startup">GitHub</a>
-    </footer>
+    <div id="root"></div>
+    <script type="module" src="/index.jsx"></script>
   </body>
 </html>

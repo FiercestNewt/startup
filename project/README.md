@@ -1,8 +1,19 @@
-# Your startup name here
+# Grow ur Stonks
 
 [My Notes](notes.md)
 
 This is my cool project for cs260
+
+## Running locally
+
+From this directory, install dependencies and start the Vite development server:
+
+```bash
+npm install
+npm run dev
+```
+
+Create a production build with `npm run build` and preview it with `npm run preview`.
 
 > [!NOTE]
 > I will be editing this during the course to reflect my progress
@@ -17,7 +28,7 @@ Players can compete in shared games with live leaderboards, allowing them to see
 
 # Design
 
-![Design image](icon.png)
+![Design image](public/figma.png)
 
 The website will have a dashboard centered around the simulated stock market. Players will be able to view stock prices, charts, their portfolio, available cash, recent transactions, and their current position on the leaderboard.
 
@@ -64,7 +75,7 @@ I am going to use the required technologies in the following ways.
 
 * **CSS** - Style the dashboard, stock cards, charts, buttons, tables, and other interface elements. CSS animations can be used to show price changes and other real-time events.
 
-* **React** - Build the website using reusable components and provide user reactivity. React will be used for components such as stock cards, portfolio tables, charts, trading forms, and the leaderboard. React routing will be used to navigate between pages such as the dashboard, portfolio, market, and account pages.
+* **Vite/React** - Vite provides the development server and production bundling, while React builds the website using reusable components and provides user reactivity. React routing is used to navigate between the login, play, scores, and about pages.
 
 * **Web Service** - Provide backend endpoints for user authentication, buying and selling stocks, retrieving portfolio information, managing games, and generating/simulating stock market data.
 

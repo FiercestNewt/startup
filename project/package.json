@@ -1,10 +1,12 @@
 {
-  "name": "cs260",
+  "name": "grow-ur-stonks",
   "version": "1.0.0",
   "description": "[My Notes](notes.md)",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "repository": {
     "type": "git",
@@ -18,7 +20,12 @@
     "url": "https://github.com/FiercestNewt/startup/issues"
   },
   "homepage": "https://github.com/FiercestNewt/startup#readme",
+  "devDependencies": {
+    "vite": "^8.3.4"
+  },
   "dependencies": {
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
     "react-router-dom": "^7.18.4"
   }
 }
