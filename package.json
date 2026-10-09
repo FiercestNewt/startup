@@ -17,5 +17,8 @@
   "bugs": {
     "url": "https://github.com/FiercestNewt/startup/issues"
   },
-  "homepage": "https://github.com/FiercestNewt/startup#readme"
+  "homepage": "https://github.com/FiercestNewt/startup#readme",
+  "dependencies": {
+    "react-router-dom": "^7.18.4"
+  }
 }
