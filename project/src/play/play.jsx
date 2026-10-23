@@ -1,67 +1,163 @@
-import React from 'react';
-import {
-  CartesianGrid,
-  Legend,
-  Line,
-  AreaChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from 'recharts';
+import React, { useState } from "react";
+import { Chart } from "./Chart";
 
-const portfolioHistory = [
-  { day: 'Day 1', you: 500, tim: 500, ada: 500 },
-  { day: 'Day 2', you: 540, tim: 525, ada: 580 },
-  { day: 'Day 3', you: 610, tim: 590, ada: 620 },
-  { day: 'Day 4', you: 575, tim: 640, ada: 680 },
-  { day: 'Day 5', you: 690, tim: 700, ada: 735 },
-  { day: 'Day 6', you: 760, tim: 745, ada: 810 },
+const INITIAL_CASH = 1000;
+
+const stocks = [
+  { ticker: "CHEM", name: "CHEM STUFF", offset: 1 },
+  { ticker: "DOT", name: "DOT COMMS", offset: 2 },
+  { ticker: "PAN", name: "PAN INC.", offset: 3 },
+  { ticker: "YUM", name: "YUMMY FOODS", offset: 4 },
 ];
 
+function createInitialPortfolio() {
+  return {
+    cash: INITIAL_CASH,
+    holdings: {},
+  };
+}
+
 export function Play() {
+  const [portfolio, setPortfolio] = useState(createInitialPortfolio);
+
+  function buyStock(ticker, quantity, price) {
+    setPortfolio((current) => {
+      const cost = quantity * price;
+
+      // Validate the transaction.
+      if (
+        quantity <= 0 ||
+        !Number.isFinite(quantity) ||
+        !Number.isFinite(price) ||
+        price <= 0 ||
+        cost > current.cash + 0.000001
+      ) {
+        return current;
+      }
+
+      const holding = current.holdings[ticker] ?? {
+        shares: 0,
+        averageCost: 0,
+      };
+
+      const newShares = holding.shares + quantity;
+      const newAverageCost =
+        (holding.shares * holding.averageCost + cost) / newShares;
+
+      return {
+        cash: current.cash - cost,
+        holdings: {
+          ...current.holdings,
+          [ticker]: {
+            shares: newShares,
+            averageCost: newAverageCost,
+          },
+        },
+      };
+    });
+  }
+
+  function sellStock(ticker, quantity, price) {
+    setPortfolio((current) => {
+      const holding = current.holdings[ticker];
+
+      // You cannot sell shares you do not own.
+      if (
+        !holding ||
+        quantity <= 0 ||
+        !Number.isFinite(quantity) ||
+        !Number.isFinite(price) ||
+        price <= 0 ||
+        quantity > holding.shares
+      ) {
+        return current;
+      }
+
+      const remainingShares = holding.shares - quantity;
+      const newHoldings = { ...current.holdings };
+
+      if (remainingShares === 0) {
+        delete newHoldings[ticker];
+      } else {
+        newHoldings[ticker] = {
+          ...holding,
+          shares: remainingShares,
+        };
+      }
+
+      return {
+        cash: current.cash + quantity * price,
+        holdings: newHoldings,
+      };
+    });
+  }
+
+  function resetPortfolio() {
+    setPortfolio(createInitialPortfolio());
+  }
+
   return (
     <main className="play-main">
-      <div className="players">Player: <span className="player-name">Its you</span></div>
-      <section className="portfolio-chart" aria-labelledby="portfolio-chart-title">
-        <h2 id="portfolio-chart-title">Portfolio value</h2>
+      <div className="players">
+        Player: <span className="player-name">It's you</span>
+      </div>
+
+      <section
+        className="portfolio-chart"
+        aria-labelledby="portfolio-chart-title"
+      >
+        <h2 id="portfolio-chart-title">Individual Stocks</h2>
+
         <div className="chart-container">
-          <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={portfolioHistory} margin={{ top: 8, right: 20, left: 0, bottom: 8 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#c3d9c8" />
-              <XAxis dataKey="day" tick={{ fill: '#20312a' }} />
-              <YAxis
-                tick={{ fill: '#20312a' }}
-                tickFormatter={(value) => `$${value}`}
-                width={64}
+          {stocks.map((stock) => {
+            const holding = portfolio.holdings[stock.ticker] ?? {
+              shares: 0,
+              averageCost: 0,
+            };
+
+            return (
+              <Chart
+                key={stock.ticker}
+                {...stock}
+                seed={12345}
+                cash={portfolio.cash}
+                shares={holding.shares}
+                averageCost={holding.averageCost}
+                onBuy={buyStock}
+                onSell={sellStock}
               />
-              <Tooltip formatter={(value) => `$${value}`} />
-              <Legend />
-              <Line type="monotone" dataKey="you" name="You" stroke="#176b45" strokeWidth={3} dot={{ r: 4 }} />
-              <Line type="monotone" dataKey="tim" name="Tim" stroke="#238b5a" strokeWidth={2} dot={{ r: 3 }} />
-              <Line type="monotone" dataKey="ada" name="Ada" stroke="#d28b29" strokeWidth={2} dot={{ r: 3 }} />
-                  <defs>
-            <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#8884d8" stopOpacity={0.8} />
-              <stop offset="95%" stopColor="#8884d8" stopOpacity={0} />
-            </linearGradient>
-            <linearGradient id="colorPv" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#82ca9d" stopOpacity={0.8} />
-              <stop offset="95%" stopColor="#82ca9d" stopOpacity={0} />
-            </linearGradient>
-          </defs>
-            </AreaChart>
-          </ResponsiveContainer>
+            );
+          })}
         </div>
       </section>
+
+      <section className="portfolio-summary">
+        <h3>Your Portfolio</h3>
+
+        <p>
+          Cash: <strong>${portfolio.cash.toFixed(2)}</strong>
+        </p>
+
+        <p>
+          Total shares:{" "}
+          <strong>
+            {Object.values(portfolio.holdings).reduce(
+              (total, holding) => total + holding.shares,
+              0,
+            )}
+          </strong>
+        </p>
+
+        <button type="button" onClick={resetPortfolio}>
+          Reset Portfolio
+        </button>
+      </section>
+
       <ul className="notification">
         <li>Tim: $123.45</li>
         <li>Ada: $678.90</li>
-        <li>You: $123.45</li>
+        <li>You: ${portfolio.cash.toFixed(2)}</li>
       </ul>
-      <div><label htmlFor="count">Score</label><input type="text" id="count" value="--" readOnly /></div>
-      <div><button type="button">Reset</button></div>
-      <div><button type="button">Buy</button><button type="button">Sell</button></div>
     </main>
   );
 }

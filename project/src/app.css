@@ -40,4 +40,68 @@ footer { padding: 0.25rem; color: #d8e8dc; background: #20312a; display:flex; al
 footer hr { margin: 0 0 0.2rem; }
 footer a { float: right; }
 .picture-box img { width: min(100%, 400px); }
+
+.chart-container {
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  flex-wrap: wrap;
+  gap: 38px;
+  padding: 40px 20px;
+}
+
+.portfolio-chart h2 {
+  text-align: center;
+  font-variant: small-caps;
+}
+
+.portfolio-summary {
+  margin: 24px auto;
+  text-align: center;
+}
+
+.portfolio-summary button {
+  padding: 8px 16px;
+  cursor: pointer;
+}
+
+.chart-container {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 24px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 30px 20px;
+}
+
+.stock-card {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+/* Keep the cards in one row on narrower screens, too */
+.stock-name {
+  font-size: clamp(11px, 1.2vw, 18px);
+}
+
+.stock-quote {
+  font-size: clamp(10px, 1vw, 15px);
+}
+
+.stock-actions {
+  gap: 12px;
+  margin-inline: 2px;
+}
+
+.stock-button {
+  padding: 7px 3px;
+  font-size: 12px;
+}
+
+.stock-quantities button {
+  font-size: 12px;
+}
+
+
 @media (max-width: 30rem) { th, td { padding: .6rem; } }
