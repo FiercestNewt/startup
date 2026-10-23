@@ -24,7 +24,7 @@ function Layout({ children }) {
       {children}
       <footer>
         <hr />
-        <span>Ethan Geslison</span>
+        <span>© 2026 Ethan Geslison</span>
         <a href="https://github.com/fiercestnewt/startup">GitHub</a>
       </footer>
     </>
