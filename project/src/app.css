@@ -18,10 +18,20 @@ main { position: relative; z-index: 0; flex: 1; display: flex; flex-direction: c
 .login-content h1 { color: #fff; text-shadow: 0 2px 12px rgb(0 0 0 / 45%); }
 .login-content form { color: #fff;margin: 0 auto; background-color: rgba(255, 255, 255, 0); }
 .join-code-screen {color: #fff;}
-.play-main { gap: 1.25rem; }
-.portfolio-chart { width: min(100%, 52rem); padding: 1rem 1.25rem 1.25rem; border: 1px solid #c3d9c8; border-radius: .75rem; background: rgb(255 255 255 / 92%); box-shadow: 0 .75rem 2rem rgb(32 49 42 / 10%); }
-.portfolio-chart h2 { margin: 0 0 .75rem; font-size: 1.35rem; }
-.chart-container { width: 100%; height: 18rem; }
+.play-main { align-items: stretch; gap: 1.25rem; }
+.play-layout { display: grid; grid-template-columns: minmax(14rem, 20rem) minmax(0, 1fr); gap: 1.25rem; width: min(100%, 78rem); margin: 0 auto; text-align: left; }
+.leaderboard, .market-panel { padding: 1.25rem; border: 1px solid #c3d9c8; border-radius: .75rem; background: rgb(255 255 255 / 92%); box-shadow: 0 .75rem 2rem rgb(32 49 42 / 10%); }
+.leaderboard { align-self: start; }
+.leaderboard h2, .market-panel h2 { margin: 0; font-size: 1.35rem; }
+.leaderboard ol { margin: 1rem 0 0; padding-left: 2rem; }
+.leaderboard li { display: flex; justify-content: space-between; gap: .75rem; padding: .8rem .5rem; border-bottom: 1px solid #c3d9c8; }
+.leaderboard .current-player { color: #176b45; font-weight: 700; }
+.market-header { display: flex; align-items: start; justify-content: space-between; gap: 1rem; }
+.market-header p { margin: .35rem 0 0; color: #52675a; }
+.round-clock { display: flex; flex-direction: column; align-items: center; min-width: 5rem; padding: .5rem .75rem; border-radius: .5rem; color: #fff; background: #176b45; }
+.round-clock span { font-size: .75rem; }
+.round-clock strong { font-size: 1.5rem; }
+.chart-container { width: 100%; }
 main h1 { margin-top: 0; font-size: clamp(2rem, 5vw, 3.25rem); }
 form { width: min(100%, 28rem); padding: 1.5rem; border-radius: .75rem; background: #fff; box-shadow: 0 .75rem 2rem rgb(32 49 42 / 10%); }
 label { display: block; margin-bottom: .4rem; font-weight: 700; }
@@ -56,8 +66,22 @@ footer a { float: right; }
 }
 
 .portfolio-summary {
-  margin: 24px auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: .5rem 1.25rem;
+  margin: 1rem 0 0;
+  padding: .75rem 1rem;
+  border: 1px solid #c3d9c8;
+  border-radius: .5rem;
+  background: #f8fbf8;
   text-align: center;
+}
+
+.portfolio-summary h3,
+.portfolio-summary p {
+  margin: 0;
 }
 
 .portfolio-summary button {
@@ -105,3 +129,8 @@ footer a { float: right; }
 
 
 @media (max-width: 30rem) { th, td { padding: .6rem; } }
+@media (max-width: 55rem) {
+  .play-layout { grid-template-columns: 1fr; }
+  .leaderboard { order: 2; }
+  .market-panel { order: 1; }
+}

@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Chart } from "./Chart";
 
 const INITIAL_CASH = 1000;
+const ROUND_SECONDS = 20;
 
 const stocks = [
   { ticker: "CHEM", name: "CHEM STUFF", offset: 1 },
@@ -19,6 +20,26 @@ function createInitialPortfolio() {
 
 export function Play() {
   const [portfolio, setPortfolio] = useState(createInitialPortfolio);
+  const [marketTick, setMarketTick] = useState(0);
+  const [secondsRemaining, setSecondsRemaining] = useState(ROUND_SECONDS);
+  const [isRunning, setIsRunning] = useState(true);
+
+  useEffect(() => {
+    if (!isRunning) return undefined;
+
+    const timer = window.setInterval(() => {
+      setMarketTick((current) => current + 1);
+      setSecondsRemaining((current) => {
+        if (current <= 1) {
+          setIsRunning(false);
+          return 0;
+        }
+        return current - 1;
+      });
+    }, 1000);
+
+    return () => window.clearInterval(timer);
+  }, [isRunning]);
 
   function buyStock(ticker, quantity, price) {
     setPortfolio((current) => {
@@ -94,70 +115,69 @@ export function Play() {
 
   function resetPortfolio() {
     setPortfolio(createInitialPortfolio());
+    setMarketTick(0);
+    setSecondsRemaining(ROUND_SECONDS);
+    setIsRunning(true);
   }
 
   return (
     <main className="play-main">
-      <div className="players">
-        Player: <span className="player-name">It's you</span>
+      <div className="play-layout">
+        <aside className="leaderboard" aria-labelledby="leaderboard-title">
+          <h2 id="leaderboard-title">Leaderboard</h2>
+          <ol>
+            <li><span>Tim</span><strong>$123.45</strong></li>
+            <li><span>Ada</span><strong>$678.90</strong></li>
+            <li className="current-player"><span>You</span><strong>${portfolio.cash.toFixed(2)}</strong></li>
+          </ol>
+        </aside>
+
+        <section className="market-panel" aria-labelledby="portfolio-chart-title">
+          <div className="market-header">
+            <div>
+              <h2 id="portfolio-chart-title">Individual Stocks</h2>
+              <p>Prices update every second. Buy low and sell high.</p>
+            </div>
+            <div className="round-clock" aria-live="polite">
+              <span>{isRunning ? "Time left" : "Round over"}</span>
+              <strong>{secondsRemaining}s</strong>
+            </div>
+          </div>
+
+          <section className="portfolio-summary">
+            <h3>Your Portfolio</h3>
+            <p>Cash: <strong>${portfolio.cash.toFixed(2)}</strong></p>
+            <p>Total shares: <strong>{Object.values(portfolio.holdings).reduce((total, holding) => total + holding.shares, 0)}</strong></p>
+            <button type="button" onClick={resetPortfolio}>
+              {isRunning ? "Reset Round" : "Start New Round"}
+            </button>
+          </section>
+
+          <div className="chart-container">
+            {stocks.map((stock) => {
+              const holding = portfolio.holdings[stock.ticker] ?? {
+                shares: 0,
+                averageCost: 0,
+              };
+
+              return (
+                <Chart
+                  key={stock.ticker}
+                  {...stock}
+                  offset={stock.offset + marketTick}
+                  seed={12345}
+                  cash={portfolio.cash}
+                  isActive={isRunning}
+                  shares={holding.shares}
+                  averageCost={holding.averageCost}
+                  onBuy={buyStock}
+                  onSell={sellStock}
+                />
+              );
+            })}
+          </div>
+        </section>
       </div>
-
-      <section
-        className="portfolio-chart"
-        aria-labelledby="portfolio-chart-title"
-      >
-        <h2 id="portfolio-chart-title">Individual Stocks</h2>
-
-        <div className="chart-container">
-          {stocks.map((stock) => {
-            const holding = portfolio.holdings[stock.ticker] ?? {
-              shares: 0,
-              averageCost: 0,
-            };
-
-            return (
-              <Chart
-                key={stock.ticker}
-                {...stock}
-                seed={12345}
-                cash={portfolio.cash}
-                shares={holding.shares}
-                averageCost={holding.averageCost}
-                onBuy={buyStock}
-                onSell={sellStock}
-              />
-            );
-          })}
-        </div>
-      </section>
-
-      <section className="portfolio-summary">
-        <h3>Your Portfolio</h3>
-
-        <p>
-          Cash: <strong>${portfolio.cash.toFixed(2)}</strong>
-        </p>
-
-        <p>
-          Total shares:{" "}
-          <strong>
-            {Object.values(portfolio.holdings).reduce(
-              (total, holding) => total + holding.shares,
-              0,
-            )}
-          </strong>
-        </p>
-
-        <button type="button" onClick={resetPortfolio}>
-          Reset Portfolio
-        </button>
-      </section>
-
-      <ul className="notification">
-        <li>Tim: $123.45</li>
-        <li>Ada: $678.90</li>
-        <li>You: ${portfolio.cash.toFixed(2)}</li>
-      </ul>
     </main>
   );
 }

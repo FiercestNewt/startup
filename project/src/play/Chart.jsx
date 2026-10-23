@@ -19,17 +19,17 @@ function getData(ticker, offset = 0, seed = 1, startPrice = 50) {
             ((hashString(ticker) ^ seed) / 4294967295) * 1000,
       );
       const data = [];
-      let previous = startPrice;
+      const firstTime = offset - 29;
 
       for (let i = 0; i < 30; i++) {
-            const movement = noise.perlin2(i / 10, offset) * startPrice * 0.035;
-            const trend = (i / 29 - 0.5) * startPrice * 0.12;
-
-            previous = Math.max(0.01, startPrice + movement + trend);
+            const time = firstTime + i;
+            const movement = noise.perlin2(time / 10, 0.25) * startPrice * 0.035;
+            const trend = (time / 29 - 0.5) * startPrice * 0.12;
+            const value = Math.max(0.01, startPrice + movement + trend);
 
             data.push({
                   index: i,
-                  value: Number(previous.toFixed(2)),
+                  value: Number(value.toFixed(2)),
             });
       }
 
@@ -46,6 +46,7 @@ export function Chart({
       shares = 0,
       averageCost = 0,
       cash = 0,
+      isActive = true,
       maxBuy = Infinity,
       maxSell = shares,
       onBuy,
@@ -69,16 +70,16 @@ export function Chart({
 
       const profit = shares * (price - averageCost);
       const affordableShares = Math.floor(cash / price);
-      const canBuy = Math.min(maxBuy, affordableShares);
-      const canSell = Math.min(maxSell, shares);
+      const canBuy = isActive ? Math.min(maxBuy, affordableShares) : 0;
+      const canSell = isActive ? Math.min(maxSell, shares) : 0;
 
       function buy(amount) {
-            const actualAmount = Math.min(amount, canBuy);
+            const actualAmount = amount === "max" ? canBuy : Math.min(amount, canBuy);
             if (actualAmount > 0) onBuy?.(ticker, actualAmount, price);
       }
 
       function sell(amount) {
-            const actualAmount = Math.min(amount, canSell);
+            const actualAmount = amount === "max" ? canSell : Math.min(amount, canSell);
             if (actualAmount > 0) onSell?.(ticker, actualAmount, price);
       }
 
