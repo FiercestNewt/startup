@@ -29,3 +29,6 @@ Interesting things I have learned about React
 I love web programming
 
 Vite is pretty cool. I am using it now for web stuff.
+
+## fetch
+I like using fetch. its cool. I guess i need to use it now
