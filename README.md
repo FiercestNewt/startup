@@ -177,16 +177,14 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 
 ## 🚀 Service deliverable
 
-For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
-
-- [ ] I completed the prerequisites for this deliverable (Simon deployed, GitHub link, Git commits)
-- [ ] **Node.js/Express HTTP service** - I did not complete this part of the deliverable.
-- [ ] **Static middleware for frontend** - I did not complete this part of the deliverable.
-- [ ] **Calls to third party endpoints** - I did not complete this part of the deliverable.
-- [ ] **Backend service endpoints** - I did not complete this part of the deliverable.
-- [ ] **Frontend calls service endpoints** - I did not complete this part of the deliverable.
-- [ ] **Supports registration, login, logout, and restricted endpoint** - I did not complete this part of the deliverable.
-- [ ] **Uses BCrypt to hash passwords** - I did not complete this part of the deliverable.
+- [X] I completed the prerequisites for this deliverable (Simon deployed, GitHub link, Git commits)
+- [X] **Node.js/Express HTTP service** - I did this part of the assignment
+- [X] **Static middleware for frontend** - I did this part of the assignment
+- [X] **Calls to third party endpoints** - I did this part of the assignment
+- [X] **Backend service endpoints** - I did this part of the assignment
+- [X] **Frontend calls service endpoints** - I did this part of the assignment
+- [X] **Supports registration, login, logout, and restricted endpoint** - I did this part of the assignment
+- [X] **Uses BCrypt to hash passwords** - I did this part of the assignment
 
 ## 🚀 DB deliverable
 
