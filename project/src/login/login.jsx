@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import DotField from './DotField';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 async function requestApi(path, options = {}) {
   const response = await fetch(`/api${path}`, {
@@ -16,7 +16,8 @@ async function requestApi(path, options = {}) {
   return data;
 }
 
-function GroupLobby({ user, onStartGame }) {
+function GroupLobby({ user }) {
+  const navigate = useNavigate();
   const [group, setGroup] = useState(null);
   const [groupName, setGroupName] = useState('');
   const [joinCode, setJoinCode] = useState('');
@@ -36,6 +37,11 @@ function GroupLobby({ user, onStartGame }) {
     }
   }
 
+  function enterGame(groupToStart) {
+    window.localStorage.setItem('activeGroupCode', groupToStart.code);
+    navigate('/play');
+  }
+
   useEffect(() => {
     if (!group || group.status !== 'lobby') return undefined;
 
@@ -44,8 +50,7 @@ function GroupLobby({ user, onStartGame }) {
         const currentGroup = await requestApi(`/groups/${group.code}`);
         setGroup(currentGroup);
         if (currentGroup.status === 'started') {
-          window.localStorage.setItem('activeGroupCode', currentGroup.code);
-          onStartGame(currentGroup);
+          enterGame(currentGroup);
         }
       } catch (requestError) {
         setError(requestError.message);
@@ -54,7 +59,7 @@ function GroupLobby({ user, onStartGame }) {
 
     const intervalId = window.setInterval(refreshGroup, 2000);
     return () => window.clearInterval(intervalId);
-  }, [group, onStartGame]);
+  }, [group?.code, group?.status, navigate]);
 
   function createGroup(event) {
     event.preventDefault();
@@ -82,8 +87,7 @@ function GroupLobby({ user, onStartGame }) {
         method: 'POST',
         body: JSON.stringify({}),
       });
-      window.localStorage.setItem('activeGroupCode', startedGroup.code);
-      onStartGame(startedGroup);
+      enterGame(startedGroup);
       return startedGroup;
     });
   }
@@ -184,7 +188,7 @@ export function Login() {
 
       <div className="login-content">
         {loading ? <p className="loading-message">Loading...</p> : user ? (
-          <GroupLobby user={user} onStartGame={() => { window.location.href = '/play'; }} />
+          <GroupLobby user={user} />
         ) : (
           <>
             <h1>Welcome to Grow ur Stonks</h1>

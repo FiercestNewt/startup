@@ -20,7 +20,10 @@ export function Chart({
 }) {
       const [quantity, setQuantity] = useState(1);
 
-      const data = useMemo(() => history.map((value, index) => ({ index, value })), [history]);
+      const data = useMemo(() => {
+            const values = Array.isArray(history) && history.length > 0 ? history : [50];
+            return values.map((value, index) => ({ index, value }));
+      }, [history]);
 
       const price = data[data.length - 1].value;
       const previousPrice = data[data.length - 2].value;
