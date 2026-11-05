@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 
+// fetches from frontend to comply with instructions per the assignment
+
 const url = "https://pokeapi.co/api/v2/pokemon/%s/";
 
 function getPokemonID() {
