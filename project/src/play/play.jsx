@@ -35,7 +35,7 @@ export function Play() {
 
   useEffect(() => {
     refresh();
-    const intervalId = window.setInterval(refresh, 1000);
+    const intervalId = window.setInterval(refresh, 3000);
     return () => window.clearInterval(intervalId);
   }, [code]);
 

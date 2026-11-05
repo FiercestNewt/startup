@@ -7,6 +7,7 @@ const app = express();
 const authCookieName = 'token';
 
 // Users and groups are stored in memory for now. They are reset when the service restarts.
+// TODO: Connect to a database when we learn that
 const users = [];
 const groups = [];
 const scores = [];
@@ -20,7 +21,7 @@ const STOCKS = [
 ];
 
 // The service port. In production the front-end code is statically hosted by the service on the same port.
-const port = process.argv.length > 2 ? process.argv[2] : 4000;
+const port = process.env.PORT || 4000;
 
 // JSON body parsing using built-in middleware
 app.use(express.json());
