@@ -5,20 +5,35 @@ import { Play } from './play/play';
 import { Scores } from './scores/scores';
 import { About } from './about/about';
 import './app.css';
+import {PokemonOfTheDay} from './pokemon';
 
 function Layout({ children }) {
   return (
     <>
-      <header>
-        <h1>Grow ur Stonks</h1>
-        <nav>
-          <menu>
-            <li><NavLink to="/">Home</NavLink></li>
-            <li><NavLink to="/play">Play</NavLink></li>
-            <li><NavLink to="/scores">Scores</NavLink></li>
-            <li><NavLink to="/about">About</NavLink></li>
-          </menu>
-        </nav>
+      <header className="site-header">
+        <div className="header-content">
+          <h1>Grow ur Stonks</h1>
+
+          <nav>
+            <menu>
+              <li>
+                <NavLink to="/">Home</NavLink>
+              </li>
+              <li>
+                <NavLink to="/play">Play</NavLink>
+              </li>
+              <li>
+                <NavLink to="/scores">Scores</NavLink>
+              </li>
+              <li>
+                <NavLink to="/about">About</NavLink>
+              </li>
+            </menu>
+          </nav>
+
+          <PokemonOfTheDay />
+        </div>
+
         <hr />
       </header>
       {children}
