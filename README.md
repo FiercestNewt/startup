@@ -198,9 +198,9 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 
 For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
 
-- [ ] I completed the prerequisites for this deliverable (Simon deployed, GitHub link, Git commits)
-- [ ] **Backend listens for WebSocket connection** - I did not complete this part of the deliverable.
-- [ ] **Frontend makes WebSocket connection** - I did not complete this part of the deliverable.
-- [ ] **Data sent over WebSocket connection** - I did not complete this part of the deliverable.
-- [ ] **WebSocket data displayed** - I did not complete this part of the deliverable.
-- [ ] **Application is fully functional** - I did not complete this part of the deliverable.
+- [X] I completed the prerequisites for this deliverable (Simon deployed, GitHub link, Git commits)
+- [X] **Backend listens for WebSocket connection** - I did this part of the assignment
+- [X] **Frontend makes WebSocket connection** - I did this part of the assignment
+- [X] **Data sent over WebSocket connection** - I did this part of the assignment
+- [X] **WebSocket data displayed** - I did this part of the assignment
+- [X] **Application is fully functional** - I did this part of the assignment
