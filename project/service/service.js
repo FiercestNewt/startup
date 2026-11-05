@@ -9,6 +9,15 @@ const authCookieName = 'token';
 // Users and groups are stored in memory for now. They are reset when the service restarts.
 const users = [];
 const groups = [];
+const scores = [];
+const ROUND_SECONDS = 20;
+const INITIAL_CASH = 1000;
+const STOCKS = [
+  { ticker: 'CHEM', name: 'CHEM STUFF', basePrice: 50 },
+  { ticker: 'DOT', name: 'DOT COMMS', basePrice: 50 },
+  { ticker: 'PAN', name: 'PAN INC.', basePrice: 50 },
+  { ticker: 'YUM', name: 'YUMMY FOODS', basePrice: 50 },
+];
 
 // The service port. In production the front-end code is statically hosted by the service on the same port.
 const port = process.argv.length > 2 ? process.argv[2] : 4000;
@@ -141,7 +150,72 @@ apiRouter.post('/groups/:code/start', verifyAuth, (req, res) => {
 
   group.status = 'started';
   group.startedAt = new Date().toISOString();
+  group.game = createGame(group);
   res.send(publicGroup(group));
+});
+
+apiRouter.get('/games/:code', verifyAuth, (req, res) => {
+  const group = findGroup(req.params.code);
+  if (!group || !group.game || !group.players.includes(req.user.email)) {
+    res.status(404).send({ msg: 'Game not found' });
+    return;
+  }
+  res.send(gameState(group, req.user.email));
+});
+
+apiRouter.post('/games/:code/trade', verifyAuth, (req, res) => {
+  const group = findGroup(req.params.code);
+  if (!group || !group.game || !group.players.includes(req.user.email)) {
+    res.status(404).send({ msg: 'Game not found' });
+    return;
+  }
+
+  updateGame(group);
+  if (group.status !== 'started') {
+    res.status(409).send({ msg: 'The game is over' });
+    return;
+  }
+
+  const ticker = normalizeString(req.body.ticker).toUpperCase();
+  const quantity = Number(req.body.quantity);
+  const action = req.body.action;
+  const stock = group.game.prices[ticker];
+  const portfolio = group.game.portfolios[req.user.email];
+
+  if (!stock || !Number.isInteger(quantity) || quantity < 1 || (action !== 'buy' && action !== 'sell')) {
+    res.status(400).send({ msg: 'Invalid trade' });
+    return;
+  }
+
+  if (action === 'buy') {
+    const cost = quantity * stock.price;
+    if (cost > portfolio.cash) {
+      res.status(400).send({ msg: 'Not enough cash' });
+      return;
+    }
+    const holding = portfolio.holdings[ticker] || { shares: 0, averageCost: 0 };
+    const shares = holding.shares + quantity;
+    portfolio.holdings[ticker] = {
+      shares,
+      averageCost: (holding.shares * holding.averageCost + cost) / shares,
+    };
+    portfolio.cash -= cost;
+  } else {
+    const holding = portfolio.holdings[ticker];
+    if (!holding || quantity > holding.shares) {
+      res.status(400).send({ msg: 'Not enough shares' });
+      return;
+    }
+    holding.shares -= quantity;
+    portfolio.cash += quantity * stock.price;
+    if (holding.shares === 0) delete portfolio.holdings[ticker];
+  }
+
+  res.send(gameState(group, req.user.email));
+});
+
+apiRouter.get('/scores', verifyAuth, (_req, res) => {
+  res.send(scores.slice().sort((a, b) => b.score - a.score).slice(0, 10));
 });
 
 apiRouter.delete('/groups/:code/leave', verifyAuth, (req, res) => {
@@ -199,6 +273,91 @@ function publicGroup(group) {
     status: group.status,
     createdAt: group.createdAt,
     ...(group.startedAt ? { startedAt: group.startedAt } : {}),
+    ...(group.game ? { gameEndsAt: group.game.endsAt } : {}),
+  };
+}
+
+function createGame(group) {
+  const now = Date.now();
+  const portfolios = {};
+  for (const email of group.players) {
+    portfolios[email] = { cash: INITIAL_CASH, holdings: {} };
+  }
+  return {
+    startedAt: now,
+    endsAt: now + ROUND_SECONDS * 1000,
+    tick: 0,
+    prices: Object.fromEntries(STOCKS.map((stock) => [
+      stock.ticker,
+      { price: stock.basePrice, history: [stock.basePrice] },
+    ])),
+    portfolios,
+  };
+}
+
+function updateGame(group) {
+  const game = group.game;
+  const nextTick = Math.min(
+    Math.floor((Date.now() - game.startedAt) / 1000),
+    ROUND_SECONDS,
+  );
+  while (game.tick < nextTick) {
+    game.tick += 1;
+    for (const stock of STOCKS) {
+      const current = game.prices[stock.ticker];
+      const movement = Math.sin(game.tick * 0.8 + stock.basePrice) * 0.04;
+      current.price = Math.max(0.01, Number((current.price * (1 + movement)).toFixed(2)));
+      current.history.push(current.price);
+    }
+  }
+  if (Date.now() >= game.endsAt && group.status === 'started') {
+    group.status = 'finished';
+    for (const email of group.players) {
+      recordScore(group, email);
+    }
+  }
+  return game;
+}
+
+function portfolioValue(portfolio, prices) {
+  return Object.entries(portfolio.holdings).reduce(
+    (total, [ticker, holding]) => total + holding.shares * prices[ticker].price,
+    portfolio.cash,
+  );
+}
+
+function recordScore(group, email) {
+  if (scores.some((score) => score.groupId === group.id && score.email === email)) return;
+  const portfolio = group.game.portfolios[email];
+  scores.push({
+    email,
+    score: Number(portfolioValue(portfolio, group.game.prices).toFixed(2)),
+    groupId: group.id,
+    date: new Date().toISOString(),
+  });
+}
+
+function gameState(group, email) {
+  updateGame(group);
+  const game = group.game;
+  const prices = Object.fromEntries(
+    Object.entries(game.prices).map(([ticker, value]) => [
+      ticker,
+      { price: value.price, history: value.history.slice(-30) },
+    ]),
+  );
+  const leaderboard = group.players.map((player) => ({
+    email: player,
+    score: Number(portfolioValue(game.portfolios[player], game.prices).toFixed(2)),
+  })).sort((a, b) => b.score - a.score);
+  return {
+    group: publicGroup(group),
+    playerEmail: email,
+    status: group.status,
+    prices,
+    portfolio: game.portfolios[email],
+    leaderboard,
+    remainingSeconds: Math.max(0, Math.ceil((game.endsAt - Date.now()) / 1000)),
   };
 }
 

@@ -30,6 +30,15 @@ Authenticated group endpoints are:
 * `POST /api/groups/:code/start` for the host to start the game.
 * `DELETE /api/groups/:code/leave` to leave a group. The host deleting their membership
   removes the group.
+* `GET /api/games/:code` to retrieve server-controlled prices, timing, portfolios, and
+  the live leaderboard.
+* `POST /api/games/:code/trade` with `{ "ticker": "CHEM", "quantity": 1, "action": "buy" }`
+  to make a server-validated trade.
+* `GET /api/scores` to retrieve the top ten completed scores.
+
+The server controls the twenty-second round clock and stock prices. Final scores value
+both cash and the current market value of unsold shares, so players do not need to sell
+everything before the round ends.
 
 > [!NOTE]
 > I will be editing this during the course to reflect my progress

@@ -1,179 +1,101 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Chart } from "./Chart";
 
-const INITIAL_CASH = 1000;
-const ROUND_SECONDS = 20;
-
 const stocks = [
-  { ticker: "CHEM", name: "CHEM STUFF", offset: 1 },
-  { ticker: "DOT", name: "DOT COMMS", offset: 2 },
-  { ticker: "PAN", name: "PAN INC.", offset: 3 },
-  { ticker: "YUM", name: "YUMMY FOODS", offset: 4 },
+  { ticker: "CHEM", name: "CHEM STUFF" },
+  { ticker: "DOT", name: "DOT COMMS" },
+  { ticker: "PAN", name: "PAN INC." },
+  { ticker: "YUM", name: "YUMMY FOODS" },
 ];
 
-function createInitialPortfolio() {
-  return {
-    cash: INITIAL_CASH,
-    holdings: {},
-  };
+async function requestGame(path, options = {}) {
+  const response = await fetch(`/api${path}`, {
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    ...options,
+  });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.msg || "Game request failed");
+  return data;
 }
 
 export function Play() {
-  const [portfolio, setPortfolio] = useState(createInitialPortfolio);
-  const [marketTick, setMarketTick] = useState(0);
-  const [secondsRemaining, setSecondsRemaining] = useState(ROUND_SECONDS);
-  const [isRunning, setIsRunning] = useState(true);
+  const [game, setGame] = useState(null);
+  const [error, setError] = useState("");
+  const code = window.localStorage.getItem("activeGroupCode");
+
+  async function refresh() {
+    if (!code) return;
+    try {
+      setGame(await requestGame(`/games/${code}`));
+    } catch (requestError) {
+      setError(requestError.message);
+    }
+  }
 
   useEffect(() => {
-    if (!isRunning) return undefined;
+    refresh();
+    const intervalId = window.setInterval(refresh, 1000);
+    return () => window.clearInterval(intervalId);
+  }, [code]);
 
-    const timer = window.setInterval(() => {
-      setMarketTick((current) => current + 1);
-      setSecondsRemaining((current) => {
-        if (current <= 1) {
-          setIsRunning(false);
-          return 0;
-        }
-        return current - 1;
+  async function trade(ticker, quantity, action) {
+    try {
+      const nextGame = await requestGame(`/games/${code}/trade`, {
+        method: "POST",
+        body: JSON.stringify({ ticker, quantity, action }),
       });
-    }, 1000);
-
-    return () => window.clearInterval(timer);
-  }, [isRunning]);
-
-  function buyStock(ticker, quantity, price) {
-    setPortfolio((current) => {
-      const cost = quantity * price;
-
-      // Validate the transaction.
-      if (
-        quantity <= 0 ||
-        !Number.isFinite(quantity) ||
-        !Number.isFinite(price) ||
-        price <= 0 ||
-        cost > current.cash + 0.000001
-      ) {
-        return current;
-      }
-
-      const holding = current.holdings[ticker] ?? {
-        shares: 0,
-        averageCost: 0,
-      };
-
-      const newShares = holding.shares + quantity;
-      const newAverageCost =
-        (holding.shares * holding.averageCost + cost) / newShares;
-
-      return {
-        cash: current.cash - cost,
-        holdings: {
-          ...current.holdings,
-          [ticker]: {
-            shares: newShares,
-            averageCost: newAverageCost,
-          },
-        },
-      };
-    });
+      setGame(nextGame);
+    } catch (requestError) {
+      setError(requestError.message);
+    }
   }
 
-  function sellStock(ticker, quantity, price) {
-    setPortfolio((current) => {
-      const holding = current.holdings[ticker];
+  const totalValue = useMemo(() => {
+    if (!game) return 0;
+    return Object.entries(game.portfolio.holdings).reduce(
+      (total, [ticker, holding]) => total + holding.shares * game.prices[ticker].price,
+      game.portfolio.cash,
+    );
+  }, [game]);
 
-      // You cannot sell shares you do not own.
-      if (
-        !holding ||
-        quantity <= 0 ||
-        !Number.isFinite(quantity) ||
-        !Number.isFinite(price) ||
-        price <= 0 ||
-        quantity > holding.shares
-      ) {
-        return current;
-      }
-
-      const remainingShares = holding.shares - quantity;
-      const newHoldings = { ...current.holdings };
-
-      if (remainingShares === 0) {
-        delete newHoldings[ticker];
-      } else {
-        newHoldings[ticker] = {
-          ...holding,
-          shares: remainingShares,
-        };
-      }
-
-      return {
-        cash: current.cash + quantity * price,
-        holdings: newHoldings,
-      };
-    });
-  }
-
-  function resetPortfolio() {
-    setPortfolio(createInitialPortfolio());
-    setMarketTick(0);
-    setSecondsRemaining(ROUND_SECONDS);
-    setIsRunning(true);
-  }
+  if (!code) return <main><h2>Join a group before starting a game.</h2></main>;
+  if (!game) return <main><p>Loading game...</p>{error && <p className="error-message">{error}</p>}</main>;
 
   return (
     <main className="play-main">
+      {error && <p className="error-message" role="alert">{error}</p>}
       <div className="play-layout">
         <aside className="leaderboard" aria-labelledby="leaderboard-title">
           <h2 id="leaderboard-title">Leaderboard</h2>
           <ol>
-            <li><span>Tim</span><strong>$123.45</strong></li>
-            <li><span>Ada</span><strong>$678.90</strong></li>
-            <li className="current-player"><span>You</span><strong>${portfolio.cash.toFixed(2)}</strong></li>
+            {game.leaderboard.map((player) => (
+              <li className={player.email === game.playerEmail ? "current-player" : ""} key={player.email}>
+                <span>{player.email}</span><strong>${player.score.toFixed(2)}</strong>
+              </li>
+            ))}
           </ol>
         </aside>
-
         <section className="market-panel" aria-labelledby="portfolio-chart-title">
           <div className="market-header">
-            <div>
-              <h2 id="portfolio-chart-title">Individual Stocks</h2>
-              <p>Prices update every second. Buy low and sell high.</p>
-            </div>
+            <div><h2 id="portfolio-chart-title">Group market</h2><p>Server prices and trades update for everyone.</p></div>
             <div className="round-clock" aria-live="polite">
-              <span>{isRunning ? "Time left" : "Round over"}</span>
-              <strong>{secondsRemaining}s</strong>
+              <span>{game.status === "started" ? "Time left" : "Round over"}</span>
+              <strong>{game.remainingSeconds}s</strong>
             </div>
           </div>
-
           <section className="portfolio-summary">
             <h3>Your Portfolio</h3>
-            <p>Cash: <strong>${portfolio.cash.toFixed(2)}</strong></p>
-            <p>Total shares: <strong>{Object.values(portfolio.holdings).reduce((total, holding) => total + holding.shares, 0)}</strong></p>
-            <button type="button" onClick={resetPortfolio}>
-              {isRunning ? "Reset Round" : "Start New Round"}
-            </button>
+            <p>Cash: <strong>${game.portfolio.cash.toFixed(2)}</strong></p>
+            <p>Total value: <strong>${totalValue.toFixed(2)}</strong></p>
           </section>
-
           <div className="chart-container">
             {stocks.map((stock) => {
-              const holding = portfolio.holdings[stock.ticker] ?? {
-                shares: 0,
-                averageCost: 0,
-              };
-
-              return (
-                <Chart
-                  key={stock.ticker}
-                  {...stock}
-                  offset={stock.offset + marketTick}
-                  seed={12345}
-                  cash={portfolio.cash}
-                  isActive={isRunning}
-                  shares={holding.shares}
-                  averageCost={holding.averageCost}
-                  onBuy={buyStock}
-                  onSell={sellStock}
-                />
-              );
+              const holding = game.portfolio.holdings[stock.ticker] ?? { shares: 0, averageCost: 0 };
+              return <Chart key={stock.ticker} {...stock} history={game.prices[stock.ticker].history}
+                cash={game.portfolio.cash} isActive={game.status === "started"} shares={holding.shares}
+                averageCost={holding.averageCost} onBuy={(ticker, quantity) => trade(ticker, quantity, "buy")}
+                onSell={(ticker, quantity) => trade(ticker, quantity, "sell")} />;
             })}
           </div>
         </section>

@@ -44,6 +44,7 @@ function GroupLobby({ user, onStartGame }) {
         const currentGroup = await requestApi(`/groups/${group.code}`);
         setGroup(currentGroup);
         if (currentGroup.status === 'started') {
+          window.localStorage.setItem('activeGroupCode', currentGroup.code);
           onStartGame(currentGroup);
         }
       } catch (requestError) {
@@ -81,6 +82,7 @@ function GroupLobby({ user, onStartGame }) {
         method: 'POST',
         body: JSON.stringify({}),
       });
+      window.localStorage.setItem('activeGroupCode', startedGroup.code);
       onStartGame(startedGroup);
       return startedGroup;
     });

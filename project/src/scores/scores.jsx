@@ -1,14 +1,29 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 export function Scores() {
+  const [scores, setScores] = useState([]);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    fetch('/api/scores', { credentials: 'include' })
+      .then(async (response) => {
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.msg || 'Unable to load scores');
+        setScores(data);
+      })
+      .catch((requestError) => setError(requestError.message));
+  }, []);
+
   return (
     <main>
+      {error && <p className="error-message">{error}</p>}
       <table>
         <thead><tr><th>#</th><th>Name</th><th>Score</th><th>Date</th></tr></thead>
         <tbody>
-          <tr><td>1</td><td>도윤 이</td><td>$1 103 831.12</td><td>May 20, 2021</td></tr>
-          <tr><td>2</td><td>Annie James</td><td>$29.00</td><td>June 2, 2021</td></tr>
-          <tr><td>3</td><td>Gunter Spears</td><td>$7.00</td><td>July 3, 2020</td></tr>
+          {scores.map((entry, index) => (
+            <tr key={`${entry.groupId}-${entry.email}`}><td>{index + 1}</td><td>{entry.email}</td>
+              <td>${entry.score.toFixed(2)}</td><td>{new Date(entry.date).toLocaleDateString()}</td></tr>
+          ))}
         </tbody>
       </table>
     </main>

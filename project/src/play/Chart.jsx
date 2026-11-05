@@ -1,48 +1,14 @@
 
 import { useMemo, useState } from "react";
 import { Area, AreaChart, ResponsiveContainer, XAxis, YAxis } from "recharts";
-import { Noise } from "noisejs";
 import "./Chart.css";
-
-function hashString(value = "") {
-      return (
-            [...String(value)].reduce(
-                  (hash, char) =>
-                        Math.imul(hash ^ char.charCodeAt(0), 16777619),
-                  2166136261,
-            ) >>> 0
-      );
-}
-
-function getData(ticker, offset = 0, seed = 1, startPrice = 50) {
-      const noise = new Noise(
-            ((hashString(ticker) ^ seed) / 4294967295) * 1000,
-      );
-      const data = [];
-      const firstTime = offset - 29;
-
-      for (let i = 0; i < 30; i++) {
-            const time = firstTime + i;
-            const movement = noise.perlin2(time / 10, 0.25) * startPrice * 0.035;
-            const trend = (time / 29 - 0.5) * startPrice * 0.12;
-            const value = Math.max(0.01, startPrice + movement + trend);
-
-            data.push({
-                  index: i,
-                  value: Number(value.toFixed(2)),
-            });
-      }
-
-      return data;
-}
 
 const presets = [1, 10, 25];
 
 export function Chart({
       ticker,
       name,
-      offset = 0,
-      seed = 1,
+      history = [50],
       shares = 0,
       averageCost = 0,
       cash = 0,
@@ -54,10 +20,7 @@ export function Chart({
 }) {
       const [quantity, setQuantity] = useState(1);
 
-      const data = useMemo(
-            () => getData(ticker, offset, seed),
-            [ticker, offset, seed],
-      );
+      const data = useMemo(() => history.map((value, index) => ({ index, value })), [history]);
 
       const price = data[data.length - 1].value;
       const previousPrice = data[data.length - 2].value;
@@ -75,12 +38,12 @@ export function Chart({
 
       function buy(amount) {
             const actualAmount = amount === "max" ? canBuy : Math.min(amount, canBuy);
-            if (actualAmount > 0) onBuy?.(ticker, actualAmount, price);
+            if (actualAmount > 0) onBuy?.(ticker, actualAmount);
       }
 
       function sell(amount) {
             const actualAmount = amount === "max" ? canSell : Math.min(amount, canSell);
-            if (actualAmount > 0) onSell?.(ticker, actualAmount, price);
+            if (actualAmount > 0) onSell?.(ticker, actualAmount);
       }
 
       return (
