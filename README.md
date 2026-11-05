@@ -17,6 +17,20 @@ npm run dev
 
 Create a production build with `npm run build` and preview it with `npm run preview`.
 
+### Backend service
+
+Start the backend from `project/service` with `npm start`. The service keeps users and
+groups in memory while it is running.
+
+Authenticated group endpoints are:
+
+* `POST /api/groups` with `{ "name": "..." }` to create a group.
+* `GET /api/groups` or `GET /api/groups/:code` to view groups.
+* `POST /api/groups/:code/join` to join a group using its six-letter code.
+* `POST /api/groups/:code/start` for the host to start the game.
+* `DELETE /api/groups/:code/leave` to leave a group. The host deleting their membership
+  removes the group.
+
 > [!NOTE]
 > I will be editing this during the course to reflect my progress
 
