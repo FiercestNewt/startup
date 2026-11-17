@@ -400,11 +400,13 @@ app.use((_req, res) => {
   res.sendFile('index.html', { root: 'public' });
 });
 
-DB.connect().catch((error) => {
-  console.error(`Unable to connect to database: ${error.message}`);
-  process.exit(1);
-});
-
-app.listen(port, () => {
-  console.log(`Listening on port ${port}`);
-});
+DB.connect()
+  .then(() => {
+    app.listen(port, () => {
+      console.log(`Listening on port ${port}`);
+    });
+  })
+  .catch((error) => {
+    console.error(`Unable to connect to database: ${error.message}`);
+    process.exit(1);
+  });

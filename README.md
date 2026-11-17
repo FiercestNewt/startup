@@ -19,8 +19,8 @@ Create a production build with `npm run build` and preview it with `npm run prev
 
 ### Backend service
 
-Start the backend from `project/service` with `npm start`. The service keeps users and
-groups in memory while it is running.
+Start the backend from `project/service` with `npm start`. The service stores users,
+groups, game state, and scores in MongoDB.
 
 Authenticated group endpoints are:
 
