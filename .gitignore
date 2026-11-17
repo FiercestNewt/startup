@@ -2,3 +2,4 @@ node_modules/
 demovite/
 simon-db/
 dbconfig,json
+dbconfig.json

@@ -3,14 +3,10 @@ const bcrypt = require('bcryptjs');
 const express = require('express');
 const uuid = require('uuid');
 const app = express();
+const DB = require('./database.js');
 
 const authCookieName = 'token';
 
-// Users and groups are stored in memory for now. They are reset when the service restarts.
-// TODO: Connect to a database when we learn that
-const users = [];
-const groups = [];
-const scores = [];
 const ROUND_SECONDS = 20;
 const INITIAL_CASH = 1000;
 const STOCKS = [
@@ -61,6 +57,7 @@ apiRouter.post('/auth/login', async (req, res) => {
 
   if (user && typeof req.body.password === 'string' && await bcrypt.compare(req.body.password, user.password)) {
     user.token = uuid.v4();
+    await DB.updateUser(user);
     setAuthCookie(res, user.token);
     res.send({ email: user.email });
     return;
@@ -72,7 +69,7 @@ apiRouter.post('/auth/login', async (req, res) => {
 apiRouter.delete('/auth/logout', async (req, res) => {
   const user = await findUser('token', req.cookies[authCookieName]);
   if (user) {
-    delete user.token;
+    await DB.updateUserRemoveAuth(user);
   }
   res.clearCookie(authCookieName);
   res.status(204).end();
@@ -83,7 +80,7 @@ apiRouter.get('/auth/me', verifyAuth, (req, res) => {
 });
 
 // Create a group and add the authenticated player as its host and first member.
-apiRouter.post('/groups', verifyAuth, (req, res) => {
+apiRouter.post('/groups', verifyAuth, async (req, res) => {
   const name = normalizeString(req.body.name);
   if (!name || name.length > 50) {
     res.status(400).send({ msg: 'Group name must be between 1 and 50 characters' });
@@ -92,24 +89,25 @@ apiRouter.post('/groups', verifyAuth, (req, res) => {
 
   const group = {
     id: uuid.v4(),
-    code: createGroupCode(),
+    code: await createGroupCode(),
     name,
     host: req.user.email,
     players: [req.user.email],
     status: 'lobby',
     createdAt: new Date().toISOString(),
   };
-  groups.push(group);
+  await DB.addGroup(group);
   res.status(201).send(publicGroup(group));
 });
 
 // Return groups without exposing authentication data.
-apiRouter.get('/groups', verifyAuth, (_req, res) => {
+apiRouter.get('/groups', verifyAuth, async (_req, res) => {
+  const groups = await DB.getGroups();
   res.send(groups.map(publicGroup));
 });
 
-apiRouter.get('/groups/:code', verifyAuth, (req, res) => {
-  const group = findGroup(req.params.code);
+apiRouter.get('/groups/:code', verifyAuth, async (req, res) => {
+  const group = await findGroup(req.params.code);
   if (!group) {
     res.status(404).send({ msg: 'Group not found' });
     return;
@@ -117,8 +115,8 @@ apiRouter.get('/groups/:code', verifyAuth, (req, res) => {
   res.send(publicGroup(group));
 });
 
-apiRouter.post('/groups/:code/join', verifyAuth, (req, res) => {
-  const group = findGroup(req.params.code);
+apiRouter.post('/groups/:code/join', verifyAuth, async (req, res) => {
+  const group = await findGroup(req.params.code);
   if (!group) {
     res.status(404).send({ msg: 'Group not found' });
     return;
@@ -130,12 +128,13 @@ apiRouter.post('/groups/:code/join', verifyAuth, (req, res) => {
 
   if (!group.players.includes(req.user.email)) {
     group.players.push(req.user.email);
+    await DB.updateGroup(group);
   }
   res.send(publicGroup(group));
 });
 
-apiRouter.post('/groups/:code/start', verifyAuth, (req, res) => {
-  const group = findGroup(req.params.code);
+apiRouter.post('/groups/:code/start', verifyAuth, async (req, res) => {
+  const group = await findGroup(req.params.code);
   if (!group) {
     res.status(404).send({ msg: 'Group not found' });
     return;
@@ -152,26 +151,27 @@ apiRouter.post('/groups/:code/start', verifyAuth, (req, res) => {
   group.status = 'started';
   group.startedAt = new Date().toISOString();
   group.game = createGame(group);
+  await DB.updateGroup(group);
   res.send(publicGroup(group));
 });
 
-apiRouter.get('/games/:code', verifyAuth, (req, res) => {
-  const group = findGroup(req.params.code);
+apiRouter.get('/games/:code', verifyAuth, async (req, res) => {
+  const group = await findGroup(req.params.code);
   if (!group || !group.game || !group.players.includes(req.user.email)) {
     res.status(404).send({ msg: 'Game not found' });
     return;
   }
-  res.send(gameState(group, req.user.email));
+  res.send(await gameState(group, req.user.email));
 });
 
-apiRouter.post('/games/:code/trade', verifyAuth, (req, res) => {
-  const group = findGroup(req.params.code);
+apiRouter.post('/games/:code/trade', verifyAuth, async (req, res) => {
+  const group = await findGroup(req.params.code);
   if (!group || !group.game || !group.players.includes(req.user.email)) {
     res.status(404).send({ msg: 'Game not found' });
     return;
   }
 
-  updateGame(group);
+  await updateGame(group);
   if (group.status !== 'started') {
     res.status(409).send({ msg: 'The game is over' });
     return;
@@ -212,25 +212,26 @@ apiRouter.post('/games/:code/trade', verifyAuth, (req, res) => {
     if (holding.shares === 0) delete portfolio.holdings[ticker];
   }
 
-  res.send(gameState(group, req.user.email));
+  await DB.updateGroup(group);
+  res.send(await gameState(group, req.user.email));
 });
 
-apiRouter.get('/scores', verifyAuth, (_req, res) => {
-  res.send(scores.slice().sort((a, b) => b.score - a.score).slice(0, 10));
+apiRouter.get('/scores', verifyAuth, async (_req, res) => {
+  res.send(await DB.getHighScores());
 });
 
-apiRouter.delete('/groups/:code/leave', verifyAuth, (req, res) => {
-  const groupIndex = groups.findIndex((group) => group.code === req.params.code.toUpperCase());
-  if (groupIndex === -1) {
+apiRouter.delete('/groups/:code/leave', verifyAuth, async (req, res) => {
+  const group = await findGroup(req.params.code);
+  if (!group) {
     res.status(404).send({ msg: 'Group not found' });
     return;
   }
 
-  const group = groups[groupIndex];
   if (group.host === req.user.email) {
-    groups.splice(groupIndex, 1);
+    await DB.deleteGroup(group.id);
   } else {
     group.players = group.players.filter((email) => email !== req.user.email);
+    await DB.updateGroup(group);
   }
   res.status(204).end();
 });
@@ -250,18 +251,18 @@ function normalizeString(value) {
   return typeof value === 'string' ? value.trim() : '';
 }
 
-function createGroupCode() {
+async function createGroupCode() {
   let code;
   do {
     code = Array.from({ length: 6 }, () =>
       String.fromCharCode(Math.floor(Math.random() * 26) + 65)
     ).join('');
-  } while (findGroup(code));
+  } while (await findGroup(code));
   return code;
 }
 
 function findGroup(code) {
-  return groups.find((group) => group.code === normalizeString(code).toUpperCase());
+  return DB.getGroup(normalizeString(code).toUpperCase());
 }
 
 function publicGroup(group) {
@@ -296,7 +297,7 @@ function createGame(group) {
   };
 }
 
-function updateGame(group) {
+async function updateGame(group) {
   const game = group.game;
   const nextTick = Math.min(
     Math.floor((Date.now() - game.startedAt) / 1000),
@@ -314,7 +315,7 @@ function updateGame(group) {
   if (Date.now() >= game.endsAt && group.status === 'started') {
     group.status = 'finished';
     for (const email of group.players) {
-      recordScore(group, email);
+      await recordScore(group, email);
     }
   }
   return game;
@@ -327,10 +328,10 @@ function portfolioValue(portfolio, prices) {
   );
 }
 
-function recordScore(group, email) {
-  if (scores.some((score) => score.groupId === group.id && score.email === email)) return;
+async function recordScore(group, email) {
+  if (await DB.scoreExists(group.id, email)) return;
   const portfolio = group.game.portfolios[email];
-  scores.push({
+  await DB.addScore({
     email,
     score: Number(portfolioValue(portfolio, group.game.prices).toFixed(2)),
     groupId: group.id,
@@ -338,8 +339,9 @@ function recordScore(group, email) {
   });
 }
 
-function gameState(group, email) {
-  updateGame(group);
+async function gameState(group, email) {
+  await updateGame(group);
+  await DB.updateGroup(group);
   const game = group.game;
   const prices = Object.fromEntries(
     Object.entries(game.prices).map(([ticker, value]) => [
@@ -368,13 +370,16 @@ async function createUser(email, password) {
     password: await bcrypt.hash(password, 10),
     token: uuid.v4(),
   };
-  users.push(user);
+  await DB.addUser(user);
   return user;
 }
 
 async function findUser(field, value) {
   if (!value) return null;
-  return users.find((user) => user[field] === value);
+  if (field === 'token') {
+    return DB.getUserByToken(value);
+  }
+  return DB.getUser(value);
 }
 
 function setAuthCookie(res, authToken) {
@@ -393,6 +398,11 @@ app.use((err, _req, res, _next) => {
 
 app.use((_req, res) => {
   res.sendFile('index.html', { root: 'public' });
+});
+
+DB.connect().catch((error) => {
+  console.error(`Unable to connect to database: ${error.message}`);
+  process.exit(1);
 });
 
 app.listen(port, () => {
