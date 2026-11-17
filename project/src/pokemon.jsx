@@ -6,6 +6,7 @@ const url = "https://pokeapi.co/api/v2/pokemon/%s/";
 
 function getPokemonID() {
       const today = new Date();
+
       const seed =
             today.getFullYear() * 10000 +
             (today.getMonth() + 1) * 100 +
@@ -13,8 +14,8 @@ function getPokemonID() {
 
       const random = Math.sin(seed) * 10000;
       const normalized = random - Math.floor(random);
-      
-      return Math.floor(normalized) + 1;
+
+      return Math.floor(normalized * 1025) + 1;
 }
 
 async function getPokemon(id) {
