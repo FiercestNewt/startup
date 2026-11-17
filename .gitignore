@@ -1,4 +1,4 @@
 node_modules/
 demovite/
-simon-react/
-simon-service/
+simon-db/
+dbconfig,json
